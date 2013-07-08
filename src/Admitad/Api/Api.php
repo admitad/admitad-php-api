@@ -72,6 +72,13 @@ class Api
         return $response;
     }
 
+    public function get($method, $params = [])
+    {
+        $request = new Request(Request::METHOD_GET, $method . '?' . http_build_query($params));
+        
+        return $this->send($request);
+    }
+
     public function getAccessToken()
     {
         return $this->accessToken;
