@@ -63,6 +63,7 @@ class Api
 
         $curl = new Curl();
         $curl->setVerifyPeer(false);
+        $curl->setTimeout(15);
         $curl->send($request, $response);
 
         if (!$response->isSuccessful()) {
@@ -75,7 +76,7 @@ class Api
     public function get($method, $params = [])
     {
         $request = new Request(Request::METHOD_GET, $method . '?' . http_build_query($params));
-        
+
         return $this->send($request);
     }
 

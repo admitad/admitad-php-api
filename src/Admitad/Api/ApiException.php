@@ -3,7 +3,6 @@
 namespace Admitad\Api;
 
 use Buzz\Message\Request;
-use Buzz\Message\Response;
 
 class ApiException extends \Exception
 {
