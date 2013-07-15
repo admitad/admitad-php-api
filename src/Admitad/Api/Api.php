@@ -2,9 +2,9 @@
 
 namespace Admitad\Api;
 
+use Admitad\Api\Exception\ApiException;
+use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
-use Buzz\Message\Request;
-use Psr\Log\LoggerInterface;
 
 class Api
 {
@@ -47,37 +47,31 @@ class Api
         return $this->send($request, null, false);
     }
 
-    public function send(Request $request, Response $response = null, $auth = true)
+    public function send(Request $request, Response $response = null, $useAuth = true)
     {
         if (is_null($response)) {
             $response = new Response();
         }
 
-        $request->setHost($this->host);
-        if ($auth) {
-            if (!$this->accessToken) {
+        if (null === $request->getHost()) {
+            $request->setHost($this->host);
+        }
+
+        if ($useAuth) {
+            if (null === $this->accessToken) {
                 throw new \InvalidArgumentException("Access token not provided");
             }
             $request->addHeader('Authorization: Bearer ' . $this->accessToken);
         }
 
-        $curl = new Curl();
-        $curl->setVerifyPeer(false);
-        $curl->setTimeout(15);
-        $curl->send($request, $response);
+        $client = $this->createClient();
+        $client->send($request, $response);
 
         if (!$response->isSuccessful()) {
-            throw new ApiException('Operation failed: ' . $response->getContent(), $request, $response);
+            throw new ApiException('Operation failed: ' . $response->getError(), $request, $response);
         }
 
         return $response;
-    }
-
-    public function get($method, $params = [])
-    {
-        $request = new Request(Request::METHOD_GET, $method . '?' . http_build_query($params));
-
-        return $this->send($request);
     }
 
     public function getAccessToken()
@@ -89,5 +83,44 @@ class Api
     {
         $this->accessToken = $accessToken;
         return $this;
+    }
+
+    public function get($method, $params = array())
+    {
+        $resource = $method . '?' . http_build_query($params);
+        $request = new Request(Request::METHOD_GET, $resource);
+        return $this->send($request);
+    }
+
+    public function post($method, $params = array())
+    {
+        $request = new Request(Request::METHOD_POST, $method);
+        $request->setContent(http_build_query($params));
+        return $this->send($request);
+    }
+
+    public function me()
+    {
+        return $this->get('/me/');
+    }
+
+    public function getReferrals()
+    {
+        return $this->get('/referrals/');
+    }
+
+    public function getReferral($id)
+    {
+        return $this->get('/referrals/' . $id);
+    }
+
+    /**
+     * @return ClientInterface
+     */
+    protected function createClient()
+    {
+        $curl = new Curl();
+        $curl->setTimeout(15);
+        return $curl;
     }
 }

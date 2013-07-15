@@ -14,3 +14,4 @@ if ((!$loader = includeIfExists(__DIR__.'/../vendor/autoload.php')) && (!$loader
 }
 
 $loader->add('Admitad\Api\Tests\\', __DIR__);
+
