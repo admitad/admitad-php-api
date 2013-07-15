@@ -19,7 +19,7 @@ class Api
 
     public function getAuthorizeUrl($clientId, $redirectUri, $scope, $responseType = 'code')
     {
-        return $this->host . '?' . http_build_query(array(
+        return $this->host . '/authorize/?' . http_build_query(array(
             'client_id' => $clientId,
             'redirect_uri' => $redirectUri,
             'scope' => $scope,
