@@ -11,8 +11,8 @@ class Object extends \ArrayObject
                 if (is_array($value)) {
                     $value = new Object($value);
                 }
+                $this[$key] = $value;
             }
-            $this[$key] = $value;
         }
     }
     public function __get($key)
