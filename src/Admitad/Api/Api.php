@@ -3,6 +3,7 @@
 namespace Admitad\Api;
 
 use Admitad\Api\Exception\ApiException;
+use Admitad\Api\Exception\InvalidSignedRequestException;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
 
@@ -14,6 +15,26 @@ class Api
     public function __construct($accessToken = null)
     {
         $this->accessToken = $accessToken;
+    }
+
+    public function getAuthorizeUrl($clientId, $redirectUri, $scope, $responseType = 'code')
+    {
+        return $this->host . '?' . http_build_query(array(
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
+            'scope' => $scope,
+            'response_type' => $responseType
+        ));
+    }
+
+    public function parseSignedRequest($signedRequest, $clientSecret)
+    {
+        list ($key, $data) = explode('.', $signedRequest);
+        $hash = hash_hmac('sha256', $data, $clientSecret);
+        if ($hash != $key) {
+            throw new InvalidSignedRequestException("Invalid signed request " . $signedRequest);
+        }
+        return json_decode(base64_decode($data), true);
     }
 
     public function requestAccessToken($clientId, $clientSecret, $code, $redirectUri)
