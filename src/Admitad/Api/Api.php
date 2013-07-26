@@ -141,7 +141,7 @@ class Api
     protected function createClient()
     {
         $curl = new Curl();
-        $curl->setTimeout(15);
+        $curl->setTimeout(300);
         return $curl;
     }
 }
