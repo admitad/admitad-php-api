@@ -135,6 +135,20 @@ class Api
         return $this->get('/referrals/' . $id);
     }
 
+    public function authorizeClient($clientId, $clientSecret, $scope)
+    {
+        $query = [
+            'client_id' => $clientId,
+            'scope' => $scope,
+            'grant_type' => 'client_credentials'
+        ];
+
+        $request = new Request(Request::METHOD_POST, '/token/');
+        $request->addHeader('Authorization: Basic ' . base64_encode($clientId . ':' . $clientSecret));
+        $request->setContent(http_build_query($query));
+        return $this->send($request, null, false);
+    }
+
     /**
      * @return ClientInterface
      */
