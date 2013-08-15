@@ -57,6 +57,12 @@ $api = new Admitad\Api\Api($accessToken);
 
 $api->get($path, $params);
 $api->post($path, $params);
+
+//for example
+$data = $api->get('/advcampaigns/', array(
+    'limit' => 20,
+    'offset' => 0
+))->getResult();
 ```
 
 For some api methods library contains shorthand functions, for example
