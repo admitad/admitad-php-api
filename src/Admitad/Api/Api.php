@@ -17,6 +17,34 @@ class Api
         $this->accessToken = $accessToken;
     }
 
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+        return $this;
+    }
+
+    public function authorizeByPassword($clientId, $clientSecret, $scope, $username, $password)
+    {
+        $query = array(
+            'client_id' => $clientId,
+            'grant_type' => 'password',
+            'username' => $username,
+            'password' => $password,
+            'scope' => $scope
+        );
+
+        $request = new Request(Request::METHOD_POST, '/token/');
+        $request->setContent(http_build_query($query));
+        $request->addHeader('Authorization: Basic ' . base64_encode($clientId . ':' . $clientSecret));
+
+        return $this->send($request, null, false);
+    }
+
     public function getAuthorizeUrl($clientId, $redirectUri, $scope, $responseType = 'code')
     {
         return $this->host . '/authorize/?' . http_build_query(array(
@@ -39,13 +67,13 @@ class Api
 
     public function requestAccessToken($clientId, $clientSecret, $code, $redirectUri)
     {
-        $query = [
+        $query = array(
             'code' => $code,
             'client_id' => $clientId,
             'client_secret' => $clientSecret,
             'grant_type' => 'authorization_code',
             'redirect_uri' => $redirectUri
-        ];
+        );
 
         $request = new Request(Request::METHOD_POST, '/token/');
         $request->setContent(http_build_query($query));
@@ -55,12 +83,12 @@ class Api
 
     public function refreshToken($clientId, $clientSecret, $refreshToken)
     {
-        $query = [
+        $query = array(
             'refresh_token' => $refreshToken,
             'client_id' => $clientId,
             'client_secret' => $clientSecret,
             'grant_type' => 'refresh_token'
-        ];
+        );
 
         $request = new Request(Request::METHOD_POST, '/token/');
         $request->setContent(http_build_query($query));
@@ -95,17 +123,6 @@ class Api
         return $response;
     }
 
-    public function getAccessToken()
-    {
-        return $this->accessToken;
-    }
-
-    public function setAccessToken($accessToken)
-    {
-        $this->accessToken = $accessToken;
-        return $this;
-    }
-
     public function get($method, $params = array())
     {
         $resource = $method . '?' . http_build_query($params);
@@ -137,11 +154,11 @@ class Api
 
     public function authorizeClient($clientId, $clientSecret, $scope)
     {
-        $query = [
+        $query = array(
             'client_id' => $clientId,
             'scope' => $scope,
             'grant_type' => 'client_credentials'
-        ];
+        );
 
         $request = new Request(Request::METHOD_POST, '/token/');
         $request->addHeader('Authorization: Basic ' . base64_encode($clientId . ':' . $clientSecret));
