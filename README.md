@@ -65,7 +65,14 @@ $data = $api->get('/advcampaigns/', array(
 ))->getResult();
 ```
 
-For some api methods library contains shorthand functions, for example
+Paginated-result methods can be iterated in this way (instead of manually call methods with different offsets)
+
 ```php
-$api->me(); //equivalent for $api->get('/me/');
+$iterator = $api->getIterator('/advcampaigns/', array(
+    'order_by' => 'id'
+));
+
+foreach ($iterator as $campaign) {
+    // do smth with campaign
+}
 ```

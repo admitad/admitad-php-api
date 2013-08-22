@@ -130,6 +130,11 @@ class Api
         return $this->send($request);
     }
 
+    public function getIterator($method, $params, $limit = 200)
+    {
+        return new Iterator($this, $method, $params, $limit);
+    }
+
     public function post($method, $params = array())
     {
         $request = new Request(Request::METHOD_POST, $method);
@@ -140,16 +145,6 @@ class Api
     public function me()
     {
         return $this->get('/me/');
-    }
-
-    public function getReferrals()
-    {
-        return $this->get('/referrals/');
-    }
-
-    public function getReferral($id)
-    {
-        return $this->get('/referrals/' . $id);
     }
 
     public function authorizeClient($clientId, $clientSecret, $scope)
