@@ -67,12 +67,11 @@ class Iterator implements \Iterator
             'count' => 0
         );
 
-        $this->results =  $result['results'] ?: array();
+        $this->results =  $result['results']->getArrayCopy() ?: array();
 
         if ($this->meta['limit'] < $this->limit) {
             $this->limit = $this->meta['limit'];
         }
-
         if (empty($this->results)) {
             $this->finished = true;
         }
