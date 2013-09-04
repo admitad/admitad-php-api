@@ -130,7 +130,7 @@ class Api
         return $this->send($request);
     }
 
-    public function getIterator($method, $params, $limit = 200)
+    public function getIterator($method, $params = array(), $limit = 200)
     {
         return new Iterator($this, $method, $params, $limit);
     }
