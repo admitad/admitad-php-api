@@ -3,6 +3,7 @@
 namespace Admitad\Api;
 
 use Admitad\Api\Exception\ApiException;
+use Admitad\Api\Exception\Exception;
 use Admitad\Api\Exception\InvalidSignedRequestException;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
@@ -57,7 +58,12 @@ class Api
 
     public function parseSignedRequest($signedRequest, $clientSecret)
     {
+        if (!$signedRequest || false === strpos('.', $signedRequest)) {
+            throw new InvalidSignedRequestException("Invalid signed request " . $signedRequest);
+        }
+
         list ($key, $data) = explode('.', $signedRequest);
+
         $hash = hash_hmac('sha256', $data, $clientSecret);
         if ($hash != $key) {
             throw new InvalidSignedRequestException("Invalid signed request " . $signedRequest);
@@ -108,7 +114,7 @@ class Api
 
         if ($useAuth) {
             if (null === $this->accessToken) {
-                throw new \InvalidArgumentException("Access token not provided");
+                throw new Exception("Access token not provided");
             }
             $request->addHeader('Authorization: Bearer ' . $this->accessToken);
         }
