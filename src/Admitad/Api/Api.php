@@ -58,7 +58,7 @@ class Api
 
     public function parseSignedRequest($signedRequest, $clientSecret)
     {
-        if (!$signedRequest || false === strpos('.', $signedRequest)) {
+        if (!$signedRequest || false === strpos($signedRequest, '.')) {
             throw new InvalidSignedRequestException("Invalid signed request " . $signedRequest);
         }
 
