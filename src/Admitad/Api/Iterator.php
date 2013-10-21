@@ -2,14 +2,14 @@
 
 namespace Admitad\Api;
 
-class Iterator implements \Iterator
+class Iterator implements \Iterator, \Countable
 {
     /**
      * @var Api
      */
     protected $api;
 
-    protected $offset = 0;
+    protected $offset;
 
     protected $initialized = false;
     protected $method;
@@ -29,7 +29,7 @@ class Iterator implements \Iterator
     public function current()
     {
         if (!$this->initialized) {
-            return false;
+            throw new \LogicException('Rewind first');
         }
 
         return current($this->results);
@@ -38,7 +38,11 @@ class Iterator implements \Iterator
 
     public function next()
     {
-        if (!$this->valid()) {
+        if (!$this->initialized) {
+            throw new \LogicException('Rewind first');
+        }
+
+        if ($this->finished) {
             return;
         }
 
@@ -72,6 +76,7 @@ class Iterator implements \Iterator
         if ($this->meta['limit'] < $this->limit) {
             $this->limit = $this->meta['limit'];
         }
+
         if (empty($this->results)) {
             $this->finished = true;
         }
@@ -80,7 +85,11 @@ class Iterator implements \Iterator
 
     public function key()
     {
-        if (!$this->valid()) {
+        if (!$this->initialized) {
+            throw new \LogicException('Rewind first');
+        }
+
+        if ($this->finished) {
             return null;
         }
 
@@ -90,15 +99,32 @@ class Iterator implements \Iterator
 
     public function valid()
     {
-        return $this->initialized && !$this->finished;
+        if (!$this->initialized) {
+            throw new \LogicException('Rewind first');
+        }
+
+        return !$this->finished;
     }
 
 
     public function rewind()
     {
+
+        if ($this->initialized && 0 === $this->offset) {
+            return;
+        }
         $this->offset = 0;
-        $this->finished = false;
         $this->initialized = true;
+        $this->finished = false;
         $this->load();
+    }
+
+    public function count()
+    {
+        if (!$this->initialized) {
+            throw new \LogicException('Rewind first');
+        }
+
+        return $this->meta['count'];
     }
 }
