@@ -8,6 +8,9 @@ use Admitad\Api\Exception\InvalidSignedRequestException;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
 
+/**
+ * @deprecated use Client instead
+ */
 class Api
 {
     protected $accessToken;
@@ -166,6 +169,15 @@ class Api
         $request->setContent(http_build_query($query));
         return $this->send($request, null, false);
     }
+
+    public function selfAuthorize($clientId, $clientSecret, $scope)
+    {
+        $r = $this->authorizeClient($clientId, $clientSecret, $scope);
+        $accessToken = $r->getResult('access_token');
+        $this->setAccessToken($accessToken);
+        return $this;
+    }
+
 
     /**
      * @return ClientInterface
