@@ -8,9 +8,6 @@ use Admitad\Api\Exception\InvalidSignedRequestException;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
 
-/**
- * @deprecated use Client instead
- */
 class Api
 {
     protected $accessToken;
