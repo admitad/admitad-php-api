@@ -29,8 +29,9 @@ $result = $response->getResult(); // or $response->getArrayResult();
 ```php
 // 1 step - get oauth authorization url
 $api = new Admitad\Api\Api();
-$response = $api->getAuthorizeUrl($clientId, $redirectUri, $scope);
-$accessToken = $response->getResult();
+$authorizeUrl = $api->getAuthorizeUrl($clientId, $redirectUri, $scope);
+// redirect user to authorizeUrl
+
 
 // 2 step - request access token by OAuth2 code returned from authorization url
 $response = $api->requestAccessToken($clientId, $clientSecret, $code, $redirectUri);
