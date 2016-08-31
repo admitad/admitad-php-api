@@ -12,6 +12,8 @@ class Api
 {
     protected $accessToken;
     protected $host = 'https://api.admitad.com';
+    private $lastRequest;
+    private $lastResponse;
 
     public function __construct($accessToken = null)
     {
@@ -112,6 +114,9 @@ class Api
             $request->setHost($this->host);
         }
 
+        $this->lastRequest = $request;
+        $this->lastResponse = $response;
+        
         if ($useAuth) {
             if (null === $this->accessToken) {
                 throw new Exception("Access token not provided");
@@ -175,7 +180,6 @@ class Api
         return $this;
     }
 
-
     /**
      * @return ClientInterface
      */
@@ -184,5 +188,15 @@ class Api
         $curl = new Curl();
         $curl->setTimeout(300);
         return $curl;
+    }
+    
+    public function getLastRequest()
+    {
+        return $this->lastRequest;
+    }
+
+    public function getLastResponse()
+    {
+        return $this->lastResponse;
     }
 }
