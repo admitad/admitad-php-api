@@ -5,6 +5,7 @@ namespace Admitad\Api;
 use Admitad\Api\Exception\ApiException;
 use Admitad\Api\Exception\Exception;
 use Admitad\Api\Exception\InvalidSignedRequestException;
+use Admitad\Api\Exception\ServerException;
 use Buzz\Client\ClientInterface;
 use Buzz\Client\Curl;
 
@@ -126,6 +127,10 @@ class Api
 
         $client = $this->createClient();
         $client->send($request, $response);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new ServerException('Server unavailable', $response->getStatusCode());
+        }
 
         if (!$response->isSuccessful()) {
             throw new ApiException('Operation failed: ' . $response->getError(), $request, $response);
