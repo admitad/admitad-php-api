@@ -13,7 +13,7 @@ class Response extends \Buzz\Message\Response
     {
 
         if (null === $this->result) {
-            $this->result = new Object($this->getArrayResult());
+            $this->result = new Model($this->getArrayResult());
         }
 
         if (null !== $field) {
