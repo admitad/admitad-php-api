@@ -1,5 +1,5 @@
 {
-    "name": "admitad/api",
+    "name": "gietos/admitad-api",
     "type": "library",
     "description": "Admitad api library",
     "keywords": ["admitad", "api"],

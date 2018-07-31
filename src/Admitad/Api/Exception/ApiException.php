@@ -17,9 +17,9 @@ class ApiException extends Exception
      */
     protected $request;
 
-    public function __construct($message, Request $request = null, Response $response = null)
+    public function __construct($message, Request $request = null, Response $response = null, $code = 0)
     {
-        parent::__construct($message);
+        parent::__construct($message, $code);
         $this->request = $request;
         $this->response = $response;
     }
