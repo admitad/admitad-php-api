@@ -3,6 +3,7 @@
     "type": "library",
     "description": "Admitad api library",
     "keywords": ["admitad", "api"],
+    "license": "MIT",
     "autoload": {
         "psr-0": { "Admitad\\Api\\": "src/" }
     },
