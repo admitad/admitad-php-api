@@ -35,7 +35,7 @@ class Api
     {
         $query = array(
             'client_id' => $clientId,
-            'grant_type' => 'password',
+            'grant_type' => 'client_credentials',
             'username' => $username,
             'password' => $password,
             'scope' => $scope
