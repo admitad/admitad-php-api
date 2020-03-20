@@ -31,13 +31,11 @@ class Api
         return $this;
     }
 
-    public function authorizeByPassword($clientId, $clientSecret, $scope, $username, $password)
+    public function authorizeByPassword($clientId, $clientSecret, $scope)
     {
         $query = array(
             'client_id' => $clientId,
-            'grant_type' => 'password',
-            'username' => $username,
-            'password' => $password,
+            'grant_type' => 'client_credentials',
             'scope' => $scope
         );
 
