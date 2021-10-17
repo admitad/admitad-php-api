@@ -1,5 +1,5 @@
 {
-    "name": "admitad/api",
+    "name": "meniam/admitad-php-api",
     "type": "library",
     "description": "Admitad api library",
     "keywords": ["admitad", "api"],
