@@ -15,11 +15,13 @@ class Model extends \ArrayObject
             }
         }
     }
+
     public function __get($key)
     {
         return $this[$key];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->offsetExists($key) ? parent::offsetGet($key) : null;
