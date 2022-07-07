@@ -26,6 +26,7 @@ class Iterator implements \Iterator, \Countable
         $this->limit = $limit;
     }
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if (!$this->initialized) {
@@ -35,8 +36,7 @@ class Iterator implements \Iterator, \Countable
         return current($this->results);
     }
 
-
-    public function next()
+    public function next(): void
     {
         if (!$this->initialized) {
             throw new \LogicException('Rewind first');
@@ -82,7 +82,7 @@ class Iterator implements \Iterator, \Countable
         }
     }
 
-
+    #[\ReturnTypeWillChange]
     public function key()
     {
         if (!$this->initialized) {
@@ -96,8 +96,7 @@ class Iterator implements \Iterator, \Countable
         return $this->offset;
     }
 
-
-    public function valid()
+    public function valid(): bool
     {
         if (!$this->initialized) {
             throw new \LogicException('Rewind first');
@@ -106,8 +105,7 @@ class Iterator implements \Iterator, \Countable
         return !$this->finished;
     }
 
-
-    public function rewind()
+    public function rewind(): void
     {
 
         if ($this->initialized && 0 === $this->offset) {
@@ -119,12 +117,13 @@ class Iterator implements \Iterator, \Countable
         $this->load();
     }
 
-    public function count()
+    #[\ReturnTypeWillChange]
+    public function count(): int
     {
         if (!$this->initialized) {
             throw new \LogicException('Rewind first');
         }
 
-        return $this->meta['count'];
+        return (int) $this->meta['count'];
     }
 }
