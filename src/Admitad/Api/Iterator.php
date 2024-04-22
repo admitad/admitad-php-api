@@ -2,54 +2,56 @@
 
 namespace Admitad\Api;
 
+use Admitad\Api\Exception\InvalidResponseException;
+use Exception;
+use GuzzleHttp\Exception\GuzzleException;
+use LogicException;
+
 class Iterator implements \Iterator, \Countable
 {
-    /**
-     * @var Api
-     */
-    protected $api;
+    protected mixed $offset;
 
-    protected $offset;
+    protected bool $initialized = false;
 
-    protected $initialized = false;
-    protected $method;
-    protected $params;
-    protected $meta;
-    protected $results;
-    protected $finished = false;
+    protected ?array $meta = null;
 
-    public function __construct(Api $api, $method, array $params = array(), $limit = 200)
+    protected ?array $results = null;
+
+    protected bool $finished = false;
+
+    public function __construct(protected Api $api, protected string $method, protected array $params = [], private int $limit = 200)
     {
-        $this->api = $api;
-        $this->method = $method;
-        $this->params = $params;
-        $this->limit = $limit;
     }
 
-    public function current()
+    public function current(): mixed
     {
         if (!$this->initialized) {
-            throw new \LogicException('Rewind first');
+            throw new LogicException('Rewind first');
         }
 
         return current($this->results);
     }
 
-
-    public function next()
+    /**
+     * @throws Exception
+     * @throws InvalidResponseException
+     * @throws GuzzleException
+     */
+    public function next(): void
     {
         if (!$this->initialized) {
-            throw new \LogicException('Rewind first');
+            throw new LogicException('Rewind first');
         }
 
         if ($this->finished) {
             return;
         }
 
-        $this->offset++;
+        ++$this->offset;
 
         if ($this->meta['count'] <= $this->offset) {
             $this->finished = true;
+
             return;
         }
 
@@ -58,35 +60,10 @@ class Iterator implements \Iterator, \Countable
         }
     }
 
-    protected function load()
-    {
-        $result = $this->api->get($this->method, array_merge($this->params, array(
-            'limit' => $this->limit,
-            'offset' => $this->offset
-        )))->getResult();
-
-        $this->meta = $result['_meta'] ?: array(
-            'limit' => $this->limit,
-            'offset' => $this->offset,
-            'count' => 0
-        );
-
-        $this->results =  $result['results']->getArrayCopy() ?: array();
-
-        if ($this->meta['limit'] < $this->limit) {
-            $this->limit = $this->meta['limit'];
-        }
-
-        if (empty($this->results)) {
-            $this->finished = true;
-        }
-    }
-
-
-    public function key()
+    public function key(): ?bool
     {
         if (!$this->initialized) {
-            throw new \LogicException('Rewind first');
+            throw new LogicException('Rewind first');
         }
 
         if ($this->finished) {
@@ -96,35 +73,62 @@ class Iterator implements \Iterator, \Countable
         return $this->offset;
     }
 
-
-    public function valid()
+    public function valid(): bool
     {
         if (!$this->initialized) {
-            throw new \LogicException('Rewind first');
+            throw new LogicException('Rewind first');
         }
 
         return !$this->finished;
     }
 
-
-    public function rewind()
+    /**
+     * @throws Exception
+     * @throws InvalidResponseException
+     * @throws GuzzleException
+     */
+    public function rewind(): void
     {
-
         if ($this->initialized && 0 === $this->offset) {
             return;
         }
+
         $this->offset = 0;
         $this->initialized = true;
         $this->finished = false;
         $this->load();
     }
 
-    public function count()
+    public function count(): int
     {
         if (!$this->initialized) {
-            throw new \LogicException('Rewind first');
+            throw new LogicException('Rewind first');
         }
 
         return $this->meta['count'];
+    }
+
+    /**
+     * @throws InvalidResponseException
+     * @throws Exception
+     * @throws GuzzleException
+     */
+    protected function load(): void
+    {
+        $response = $this->api->get($this->method, array_merge($this->params, ['limit' => $this->limit, 'offset' => $this->offset]));
+
+        $result = $this->api->getArrayResultFromResponse($response);
+
+        $this->meta = $result['_meta'] ?: ['limit' => $this->limit, 'offset' => $this->offset, 'count' => 0];
+
+        $this->results = $result['results']->getArrayCopy() ?: [];
+
+        if ($this->meta['limit'] < $this->limit) {
+            $this->limit = $this->meta['limit'];
+        }
+
+        if (empty($this->results)) {
+            $this->finished = true;
+        }
     }
 }

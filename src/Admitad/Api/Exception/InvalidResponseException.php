@@ -2,7 +2,7 @@
 
 namespace Admitad\Api\Exception;
 
-class InvalidResponseException extends Exception
+class InvalidResponseException extends \Exception
 {
     public function __construct($content)
     {

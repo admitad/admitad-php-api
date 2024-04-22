@@ -2,3 +2,5 @@
 /vendor/
 /composer.lock
 /phpunit.xml
+/rector.php
+.cache
