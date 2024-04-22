@@ -2,7 +2,7 @@
 
 namespace Admitad\Api\Exception;
 
-class InvalidSignedRequestException extends Exception
+class InvalidSignedRequestException extends \Exception
 {
     public function __construct($signedRequest)
     {
