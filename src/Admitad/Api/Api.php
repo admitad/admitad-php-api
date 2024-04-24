@@ -13,8 +13,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class Api
 {
-    private const MODULE_ID = 'admitad.tracking';
-
     protected string $host = 'https://api.admitad.com';
 
     public function __construct(protected ?string $accessToken = null)
@@ -41,6 +39,7 @@ class Api
         $query = ['client_id' => $clientId, 'grant_type' => 'password', 'username' => $username, 'password' => $password, 'scope' => $scope];
 
         $request = new Request('POST', '/token/' . http_build_query($query));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request = $request->withHeader('Authorization', 'Basic ' . base64_encode($clientId . ':' . $clientSecret));
 
         return $this->send($request, false);
@@ -62,7 +61,7 @@ class Api
 
         [$key, $data] = explode('.', $signedRequest);
 
-        $hash = hash_hmac('sha256', $data, (string) $clientSecret);
+        $hash = hash_hmac('sha256', $data, $clientSecret);
 
         if ($hash !== $key) {
             throw new InvalidSignedRequestException('Invalid signed request ' . $signedRequest);
@@ -79,6 +78,7 @@ class Api
         $query = ['code' => $code, 'client_id' => $clientId, 'client_secret' => $clientSecret, 'grant_type' => 'authorization_code', 'redirect_uri' => $redirectUri];
 
         $request = new Request('POST', '/token/', [], http_build_query($query));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         return $this->send($request, false);
     }
@@ -91,6 +91,7 @@ class Api
         $query = ['refresh_token' => $refreshToken, 'client_id' => $clientId, 'client_secret' => $clientSecret, 'grant_type' => 'refresh_token'];
 
         $request = new Request('POST', '/token/', [], http_build_query($query));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         return $this->send($request, false);
     }
@@ -113,7 +114,6 @@ class Api
         try {
             $response = $client->send($request);
         } catch (Exception $ex) {
-            AddMessage2Log($ex->getMessage(), self::MODULE_ID);
         }
 
         if (200 !== $response->getStatusCode()) {
@@ -145,6 +145,7 @@ class Api
     public function post(string $method, array $params = []): ?ResponseInterface
     {
         $request = new Request('POST', $method, [], http_build_query($params));
+        $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         return $this->send($request);
     }
