@@ -121,7 +121,7 @@ class Iterator implements \Iterator, \Countable
 
         $this->meta = $result['_meta'] ?: ['limit' => $this->limit, 'offset' => $this->offset, 'count' => 0];
 
-        $this->results = $result['results']->getArrayCopy() ?: [];
+        $this->results = $result['results']?: [];
 
         if ($this->meta['limit'] < $this->limit) {
             $this->limit = $this->meta['limit'];
