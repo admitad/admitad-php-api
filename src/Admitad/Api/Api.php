@@ -4,8 +4,8 @@ namespace Admitad\Api;
 
 use Admitad\Api\Exception\InvalidResponseException;
 use Admitad\Api\Exception\InvalidSignedRequestException;
-use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -15,9 +15,7 @@ class Api
 {
     protected string $host = 'https://api.admitad.com';
 
-    public function __construct(protected ?string $accessToken = null)
-    {
-    }
+    public function __construct(protected ?string $accessToken = null) {}
 
     public function getAccessToken(): ?string
     {
@@ -32,7 +30,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function authorizeByPassword(string $clientId, string $clientSecret, string $scope, string $username, string $password): ResponseInterface
     {
@@ -71,7 +69,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function requestAccessToken(string $clientId, string $clientSecret, string $code, string $redirectUri): ResponseInterface
     {
@@ -84,7 +82,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function refreshToken(string $clientId, string $clientSecret, string $refreshToken): ResponseInterface
     {
@@ -97,13 +95,13 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
-    public function send(RequestInterface|MessageInterface $request, bool $useAuth = true): ResponseInterface
+    public function send(MessageInterface|RequestInterface $request, bool $useAuth = true): ResponseInterface
     {
         if ($useAuth) {
             if (null === $this->accessToken) {
-                throw new Exception('Access token not provided');
+                throw new \Exception('Access token not provided');
             }
 
             $request = $request->withHeader('Authorization', 'Bearer ' . $this->accessToken);
@@ -113,18 +111,15 @@ class Api
 
         try {
             $response = $client->send($request);
-        } catch (Exception $ex) {
-        }
-
-        if (200 !== $response->getStatusCode()) {
-            throw new Exception('Operation failed: '.json_encode($response->getBody()->getContents()));
+        } catch (GuzzleException $ex) {
+            throw new \Exception('Operation failed: ' . $ex->getMessage());
         }
 
         return $response;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function get(string $method, array $params = []): ResponseInterface
     {
@@ -140,7 +135,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function post(string $method, array $params = []): ?ResponseInterface
     {
@@ -151,7 +146,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function me(): ResponseInterface
     {
@@ -159,7 +154,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function authorizeClient(string $clientId, string $clientSecret, string $scope): ResponseInterface
     {
@@ -178,7 +173,7 @@ class Api
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws InvalidResponseException
      */
     public function selfAuthorize(string $clientId, string $clientSecret, string $scope): static
@@ -191,15 +186,6 @@ class Api
         return $this;
     }
 
-    protected function createClient(): Client
-    {
-        return new Client([
-            'base_uri' => $this->host,
-            'timeout' => 300,
-        ]);
-    }
-
-
     /**
      * @throws InvalidResponseException
      */
@@ -207,7 +193,8 @@ class Api
     {
         $arrayResult = [];
         $content = $response->getBody()->getContents();
-        if('' === $content) {
+
+        if ('' === $content) {
             return [];
         }
 
@@ -222,10 +209,18 @@ class Api
 
     public function getModelFromArrayResult(?ResponseInterface $arrayResult = null): ?Model
     {
-        if(null !== $arrayResult) {
+        if (null !== $arrayResult) {
             return new Model($arrayResult);
         }
 
         return null;
+    }
+
+    protected function createClient(): Client
+    {
+        return new Client([
+            'base_uri' => $this->host,
+            'timeout' => 300,
+        ]);
     }
 }

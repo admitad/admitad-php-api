@@ -3,9 +3,7 @@
 namespace Admitad\Api;
 
 use Admitad\Api\Exception\InvalidResponseException;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use LogicException;
 
 class Iterator implements \Iterator, \Countable
 {
@@ -19,28 +17,26 @@ class Iterator implements \Iterator, \Countable
 
     protected bool $finished = false;
 
-    public function __construct(protected Api $api, protected string $method, protected array $params = [], private int $limit = 200)
-    {
-    }
+    public function __construct(protected Api $api, protected string $method, protected array $params = [], private int $limit = 200) {}
 
     public function current(): mixed
     {
         if (!$this->initialized) {
-            throw new LogicException('Rewind first');
+            throw new \LogicException('Rewind first');
         }
 
         return current($this->results);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws InvalidResponseException
      * @throws GuzzleException
      */
     public function next(): void
     {
         if (!$this->initialized) {
-            throw new LogicException('Rewind first');
+            throw new \LogicException('Rewind first');
         }
 
         if ($this->finished) {
@@ -63,7 +59,7 @@ class Iterator implements \Iterator, \Countable
     public function key(): ?bool
     {
         if (!$this->initialized) {
-            throw new LogicException('Rewind first');
+            throw new \LogicException('Rewind first');
         }
 
         if ($this->finished) {
@@ -76,14 +72,14 @@ class Iterator implements \Iterator, \Countable
     public function valid(): bool
     {
         if (!$this->initialized) {
-            throw new LogicException('Rewind first');
+            throw new \LogicException('Rewind first');
         }
 
         return !$this->finished;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws InvalidResponseException
      * @throws GuzzleException
      */
@@ -102,7 +98,7 @@ class Iterator implements \Iterator, \Countable
     public function count(): int
     {
         if (!$this->initialized) {
-            throw new LogicException('Rewind first');
+            throw new \LogicException('Rewind first');
         }
 
         return $this->meta['count'];
@@ -110,7 +106,7 @@ class Iterator implements \Iterator, \Countable
 
     /**
      * @throws InvalidResponseException
-     * @throws Exception
+     * @throws \Exception
      * @throws GuzzleException
      */
     protected function load(): void
